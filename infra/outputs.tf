@@ -32,3 +32,18 @@ output "instance_profile_name" {
   description = "IAM instance profile for the temporary EC2 instance"
   value       = aws_iam_instance_profile.weather_app.name
 }
+
+output "instance_id" {
+  description = "ID of the temporary EC2 instance"
+  value       = aws_instance.weather_app.id
+}
+
+output "public_ip" {
+  description = "Temporary public IP assigned to the instance"
+  value       = aws_instance.weather_app.public_ip
+}
+
+output "application_url" {
+  description = "Temporary HTTP address for the application"
+  value       = "http://${aws_instance.weather_app.public_ip}"
+}
