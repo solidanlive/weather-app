@@ -1,0 +1,30 @@
+#!/bin/bash
+
+set -euxo pipefail
+
+exec > >(
+  tee /var/log/weather-app-bootstrap.log |
+  logger -t weather-app-bootstrap -s 2>/dev/console
+) 2>&1
+
+dnf install -y docker
+
+systemctl enable --now docker
+systemctl enable --now amazon-ssm-agent
+
+aws ecr get-login-password \
+  --region "${aws_region}" \
+  | docker login \
+      --username AWS \
+      --password-stdin "${ecr_registry}"
+
+docker pull "${image_uri}"
+
+docker rm --force weather-app 2>/dev/null || true
+
+docker run \
+  --detach \
+  --name weather-app \
+  --restart unless-stopped \
+  --publish 80:3000 \
+  "${image_uri}"
