@@ -1,7 +1,14 @@
 node_modules/
 dist/
 .env
+.env.*
+!.env.example
 npm-debug.log*
+
+# Local project archives and retired lab files
+weather-frontend.tar.gz
+infra-ec2-lab/
+
 # OpenTofu
 .terraform/
 *.tfstate
@@ -9,4 +16,3 @@ npm-debug.log*
 *.tfplan
 *.tfvars
 crash.log
-infra-ec2-lab/

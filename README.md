@@ -1,6 +1,6 @@
 # Weather App
 
-A mobile-friendly weather application built as a hands-on exercise in application development, containerization, infrastructure as code, localization, and AWS hosting.
+A mobile-friendly weather application built as a hands-on exercise in application development, containerization, infrastructure as code, localization, AWS hosting, and automated deployment.
 
 **Live application:** https://d27apey3rzosoo.cloudfront.net
 
@@ -22,21 +22,34 @@ A mobile-friendly weather application built as a hands-on exercise in applicatio
 
 ```mermaid
 flowchart LR
+    Developer[Developer]
+    GitHub[GitHub Repository]
+    Actions[GitHub Actions]
+    IAM[AWS IAM and OIDC]
     User[Phone or Browser]
     CloudFront[Amazon CloudFront]
     S3[Private Amazon S3 Bucket]
     Weather[Open-Meteo API]
     Location[BigDataCloud API]
 
+    Developer -->|Push to main| GitHub
+    GitHub -->|Trigger workflow| Actions
+    Actions -->|Request temporary credentials| IAM
+    IAM -->|Temporary deployment role| Actions
+    Actions -->|Upload static files| S3
+    Actions -->|Invalidate cache| CloudFront
+
     User -->|HTTPS| CloudFront
     CloudFront -->|Origin Access Control| S3
     User -->|Weather request| Weather
-    User -->|Reverse geocoding request| Location
+    User -->|Reverse-geocoding request| Location
 ```
 
 The production application is completely static. CloudFront serves the files from a private S3 bucket while the browser retrieves weather and location information directly from external APIs.
 
 There is no continuously running application server.
+
+OpenTofu manages the AWS infrastructure. GitHub Actions manages the deployed website files.
 
 ## Technology
 
@@ -48,21 +61,25 @@ There is no continuously running application server.
 * OpenTofu
 * Amazon S3
 * Amazon CloudFront
+* AWS IAM and OpenID Connect
+* GitHub Actions
 * Open-Meteo API
 * BigDataCloud reverse-geocoding API
-* GitHub
 
 ## Project Structure
 
 ```text
 weather-app/
-├── public/             Static frontend files
-├── src/                TypeScript application code
-├── infra/              OpenTofu S3 and CloudFront infrastructure
-├── Dockerfile          Container image definition
-├── package.json        Node.js scripts and dependencies
-├── tsconfig.json       TypeScript configuration
-└── README.md           Project documentation
+├── .github/
+│   └── workflows/
+│       └── deploy.yml     GitHub Actions deployment workflow
+├── public/                Static frontend files
+├── src/                   TypeScript application code
+├── infra/                 OpenTofu AWS infrastructure
+├── Dockerfile             Container image definition
+├── package.json           Node.js scripts and dependencies
+├── tsconfig.json          TypeScript configuration
+└── README.md              Project documentation
 ```
 
 ## Run Locally
@@ -70,7 +87,7 @@ weather-app/
 Install dependencies and compile the TypeScript project:
 
 ```bash
-npm install
+npm ci
 npm run build
 npm start
 ```
@@ -123,20 +140,36 @@ The AWS infrastructure is managed with OpenTofu and includes:
 * CloudFront Origin Access Control
 * An HTTPS CloudFront distribution
 * A remote OpenTofu state backend
+* A GitHub OpenID Connect identity provider
+* A least-privilege IAM deployment role
 
-The infrastructure configuration is provided as a learning reference. Before applying it in another AWS account, update the backend configuration and review all resource settings.
+The infrastructure configuration is provided as a learning reference. Before applying it in another AWS account, update the backend configuration, repository identifiers, and other account-specific settings.
 
-## Deployment
+## Automated Deployment
 
-Application files are currently deployed through OpenTofu. After an update, the CloudFront cache is invalidated so users receive the latest HTML, CSS, and JavaScript.
+Changes to `public/` or the deployment workflow are automatically deployed when pushed to the `main` branch.
 
-Automated deployment through GitHub Actions is planned as the next project stage.
+The GitHub Actions workflow:
+
+1. Checks out the repository
+2. Installs the locked Node.js dependencies
+3. compiles the TypeScript project as a validation step
+4. Requests temporary AWS credentials through GitHub OIDC
+5. Synchronizes the static frontend files to S3
+6. Invalidates the CloudFront cache
+
+The workflow can also be started manually from the GitHub Actions page.
+
+No permanent AWS access keys are stored in GitHub.
 
 ## Security
 
 * The S3 bucket is not publicly accessible
 * CloudFront is the only permitted S3 reader
 * HTTP requests redirect to HTTPS
+* GitHub receives short-lived AWS credentials through OIDC
+* The deployment role is restricted to this repository's `main` branch
+* The deployment role can modify only the website bucket and invalidate its CloudFront distribution
 * No AWS credentials or API keys are stored in the repository
 * Browser preferences remain on the user's device
 * The complete Git history was scanned with Gitleaks before publication
