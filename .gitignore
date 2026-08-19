@@ -2,3 +2,10 @@ node_modules/
 dist/
 .env
 npm-debug.log*
+# OpenTofu
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+crash.log
