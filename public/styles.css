@@ -42,9 +42,67 @@ h2 {
   font-size: 1.1rem;
 }
 
+.preferences {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 20px 0 16px;
+  padding: 12px;
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 14px;
+  background: rgb(255 255 255 / 5%);
+}
+
+.preference {
+  display: grid;
+  gap: 6px;
+  color: #bfdbfe;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.preference select {
+  min-width: 0;
+  width: 100%;
+  padding: 10px 32px 10px 10px;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 10px;
+  color: #f8fafc;
+  background: #172554;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: normal;
+  cursor: pointer;
+}
+
+.preference select:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.preference select:focus-visible,
+.location-button:focus-visible,
+.attribution a:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 3px;
+}
+
 #status,
 .current p {
   color: #cbd5e1;
+}
+
+.location-name {
+  margin: 18px 0 0;
+  color: #f8fafc;
+  font-weight: 700;
+}
+
+.location-name::before {
+  content: "📍";
+  margin-right: 6px;
 }
 
 .condition {
@@ -60,10 +118,22 @@ h2 {
   line-height: 1;
 }
 
+.temperature-unit {
+  margin-left: 4px;
+  color: #bfdbfe;
+  font-size: 1.75rem;
+  vertical-align: top;
+}
+
 .details {
   display: flex;
-  gap: 24px;
+  flex-wrap: wrap;
+  gap: 8px 24px;
   margin-top: 24px;
+}
+
+.details p {
+  margin: 0;
 }
 
 .forecast {
@@ -73,7 +143,7 @@ h2 {
 
 .forecast-day {
   display: grid;
-  grid-template-columns: 45px 1fr auto;
+  grid-template-columns: 45px minmax(0, 1fr) auto;
   gap: 12px;
   align-items: center;
   padding: 12px;
@@ -84,6 +154,10 @@ h2 {
 .forecast-day span {
   color: #dbeafe;
   font-size: 0.9rem;
+}
+
+.forecast-day span:last-child {
+  white-space: nowrap;
 }
 
 .location-button {
@@ -112,9 +186,46 @@ h2 {
   margin-top: 24px;
   color: #94a3b8;
   font-size: 0.75rem;
+  line-height: 1.6;
   text-align: center;
+}
+
+.attribution-separator {
+  margin: 0 4px;
 }
 
 .attribution a {
   color: #bfdbfe;
+}
+
+@media (max-width: 380px) {
+  body {
+    padding: 12px;
+  }
+
+  .weather-card {
+    padding: 22px;
+  }
+
+  .preferences {
+    grid-template-columns: 1fr;
+  }
+
+  .temperature {
+    font-size: 4.25rem;
+  }
+
+  .forecast-day {
+    grid-template-columns: 40px minmax(0, 1fr);
+  }
+
+  .forecast-day span:last-child {
+    grid-column: 2;
+  }
+
+  .attribution-separator {
+    display: block;
+    height: 4px;
+    overflow: hidden;
+  }
 }

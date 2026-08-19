@@ -15,12 +15,37 @@
 </head>
 
 <body>
-  <main class="weather-card">
+  <main id="weather-card" class="weather-card">
     <header>
-      <p class="eyebrow">CURRENT CONDITIONS</p>
-      <h1>Local Weather</h1>
+      <p class="eyebrow" data-i18n="eyebrow">
+        CURRENT CONDITIONS
+      </p>
 
-      <p id="status">
+      <h1 data-i18n="title">Local Weather</h1>
+
+      <div class="preferences" aria-label="Preferences">
+        <label class="preference" for="language-select">
+          <span data-i18n="languageLabel">Language</span>
+
+          <select id="language-select">
+            <option value="en">English</option>
+            <option value="de">Deutsch</option>
+          </select>
+        </label>
+
+        <label class="preference" for="units-select">
+          <span data-i18n="unitsLabel">Units</span>
+
+          <select id="units-select">
+            <option value="imperial">°F · mph</option>
+            <option value="metric">°C · km/h</option>
+          </select>
+        </label>
+      </div>
+
+      <p id="location-name" class="location-name" hidden></p>
+
+      <p id="status" role="status" aria-live="polite">
         Use your location to load the weather.
       </p>
 
@@ -38,37 +63,57 @@
         <p id="condition" class="condition"></p>
 
         <p class="temperature">
-          <span id="temperature"></span>°
+          <span id="temperature"></span><span
+            id="current-temperature-unit"
+            class="temperature-unit"
+          ></span>
         </p>
 
         <p>
-          Feels like <span id="feels-like"></span>°F
+          <span data-i18n="feelsLike">Feels like</span>
+          <span id="feels-like"></span><span
+            id="feels-like-unit"
+          ></span>
         </p>
       </div>
 
       <div class="details">
         <p>
-          Humidity <strong id="humidity"></strong>%
+          <span data-i18n="humidity">Humidity</span>
+          <strong id="humidity"></strong>%
         </p>
 
         <p>
-          Wind <strong id="wind"></strong> mph
+          <span data-i18n="wind">Wind</span>
+          <strong id="wind"></strong>
+          <span id="wind-unit"></span>
         </p>
       </div>
 
-      <h2>Five-day forecast</h2>
+      <h2 data-i18n="forecastHeading">Five-day forecast</h2>
 
       <div id="forecast" class="forecast"></div>
     </section>
 
     <footer class="attribution">
-      Weather data by
+      <span data-i18n="weatherDataBy">Weather data by</span>
       <a
         href="https://open-meteo.com/"
         target="_blank"
         rel="noopener noreferrer"
       >
         Open-Meteo
+      </a>
+
+      <span class="attribution-separator" aria-hidden="true">·</span>
+
+      <span data-i18n="locationDataBy">Location data by</span>
+      <a
+        href="https://www.bigdatacloud.com/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        BigDataCloud
       </a>
     </footer>
   </main>
