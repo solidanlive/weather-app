@@ -2,22 +2,33 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
   >
+
   <title>Local Weather</title>
+
   <link rel="stylesheet" href="/styles.css">
   <script src="/app.js" defer></script>
 </head>
+
 <body>
   <main class="weather-card">
     <header>
       <p class="eyebrow">CURRENT CONDITIONS</p>
       <h1>Local Weather</h1>
-      <p id="status">Use your location to load the weather.</p>
 
-      <button id="location-button" class="location-button" type="button">
+      <p id="status">
+        Use your location to load the weather.
+      </p>
+
+      <button
+        id="location-button"
+        class="location-button"
+        type="button"
+      >
         Use My Location
       </button>
     </header>
@@ -30,17 +41,36 @@
           <span id="temperature"></span>°
         </p>
 
-        <p>Feels like <span id="feels-like"></span>°F</p>
+        <p>
+          Feels like <span id="feels-like"></span>°F
+        </p>
       </div>
 
       <div class="details">
-        <p>Humidity <strong id="humidity"></strong>%</p>
-        <p>Wind <strong id="wind"></strong> mph</p>
+        <p>
+          Humidity <strong id="humidity"></strong>%
+        </p>
+
+        <p>
+          Wind <strong id="wind"></strong> mph
+        </p>
       </div>
 
       <h2>Five-day forecast</h2>
+
       <div id="forecast" class="forecast"></div>
     </section>
+
+    <footer class="attribution">
+      Weather data by
+      <a
+        href="https://open-meteo.com/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Open-Meteo
+      </a>
+    </footer>
   </main>
 </body>
 </html>
