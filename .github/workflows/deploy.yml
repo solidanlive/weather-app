@@ -1,0 +1,69 @@
+name: Deploy weather application
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "public/**"
+      - ".github/workflows/deploy.yml"
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: weather-app-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Validate and deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Configure Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate application
+        run: npm run build
+
+      - name: Obtain temporary AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6.2.3
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: us-east-1
+          role-session-name: weather-app-${{ github.run_id }}
+          allowed-account-ids: "646422577656"
+
+      - name: Upload static assets
+        run: |
+          aws s3 sync public/ "s3://${{ vars.S3_BUCKET_NAME }}" \
+            --delete \
+            --exclude "index.html" \
+            --cache-control "public, max-age=300" \
+            --only-show-errors
+
+          aws s3 cp public/index.html \
+            "s3://${{ vars.S3_BUCKET_NAME }}/index.html" \
+            --content-type "text/html; charset=utf-8" \
+            --cache-control "no-cache" \
+            --only-show-errors
+
+      - name: Clear CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}" \
+            --paths "/*"

@@ -1,22 +1,5 @@
 locals {
   origin_id = "${var.project_name}-s3-origin"
-
-  site_files = {
-    "index.html" = {
-      content_type  = "text/html; charset=utf-8"
-      cache_control = "no-cache"
-    }
-
-    "app.js" = {
-      content_type  = "application/javascript; charset=utf-8"
-      cache_control = "public, max-age=300"
-    }
-
-    "styles.css" = {
-      content_type  = "text/css; charset=utf-8"
-      cache_control = "public, max-age=300"
-    }
-  }
 }
 
 data "aws_cloudfront_cache_policy" "optimized" {
@@ -67,15 +50,12 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "website" {
   }
 }
 
-resource "aws_s3_object" "site" {
-  for_each = local.site_files
+removed {
+  from = aws_s3_object.site
 
-  bucket        = aws_s3_bucket.website.id
-  key           = each.key
-  source        = "${path.module}/../public/${each.key}"
-  etag          = filemd5("${path.module}/../public/${each.key}")
-  content_type  = each.value.content_type
-  cache_control = each.value.cache_control
+  lifecycle {
+    destroy = false
+  }
 }
 
 resource "aws_cloudfront_origin_access_control" "website" {

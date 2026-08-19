@@ -17,3 +17,8 @@ output "website_url" {
   description = "HTTPS URL for the weather application"
   value       = "https://${aws_cloudfront_distribution.website.domain_name}"
 }
+
+output "github_actions_role_arn" {
+  description = "IAM role assumed by the GitHub Actions deployment workflow"
+  value       = aws_iam_role.github_deploy.arn
+}
