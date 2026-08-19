@@ -9,3 +9,4 @@ npm-debug.log*
 *.tfplan
 *.tfvars
 crash.log
+infra-ec2-lab/
