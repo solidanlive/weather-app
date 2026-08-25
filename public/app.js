@@ -138,6 +138,37 @@ const weatherDescriptions = {
   }
 };
 
+const weatherIcons = {
+  0: "☀️",
+  1: "🌤️",
+  2: "⛅",
+  3: "☁️",
+  45: "🌫️",
+  48: "🌫️",
+  51: "🌦️",
+  53: "🌦️",
+  55: "🌧️",
+  56: "🌨️",
+  57: "🌨️",
+  61: "🌦️",
+  63: "🌧️",
+  65: "🌧️",
+  66: "🌨️",
+  67: "🌨️",
+  71: "🌨️",
+  73: "❄️",
+  75: "❄️",
+  77: "❄️",
+  80: "🌦️",
+  81: "🌧️",
+  82: "🌧️",
+  85: "🌨️",
+  86: "🌨️",
+  95: "⛈️",
+  96: "⛈️",
+  99: "⛈️"
+};
+
 let language = getInitialLanguage();
 let units = getInitialUnits();
 let lastCoordinates = null;
@@ -229,6 +260,18 @@ function describeWeather(code) {
     translate("unknownConditions");
 }
 
+function weatherIcon(code, isDay = true) {
+  if (!isDay && (code === 0 || code === 1)) {
+    return "🌙";
+  }
+
+  if (!isDay && code === 2) {
+    return "☁️";
+  }
+
+  return weatherIcons[code] ?? "❔";
+}
+
 function requestCurrentPosition() {
   return new Promise((resolve, reject) => {
     navigator.geolocation.getCurrentPosition(
@@ -278,6 +321,7 @@ async function getWeather(latitude, longitude, requestedUnits) {
       "apparent_temperature",
       "relative_humidity_2m",
       "weather_code",
+      "is_day",
       "wind_speed_10m"
     ].join(","),
     daily: [
@@ -311,7 +355,8 @@ async function getWeather(latitude, longitude, requestedUnits) {
       feelsLike: data.current.apparent_temperature,
       humidity: data.current.relative_humidity_2m,
       windSpeed: data.current.wind_speed_10m,
-      weatherCode: data.current.weather_code
+      weatherCode: data.current.weather_code,
+      isDay: data.current.is_day === 1
     },
     forecast: data.daily.time.map((date, index) => ({
       date,
@@ -348,6 +393,12 @@ async function getLocationName(latitude, longitude) {
 }
 
 function displayWeather(weather) {
+  document.querySelector("#current-weather-icon").textContent =
+    weatherIcon(
+      weather.current.weatherCode,
+      weather.current.isDay
+    );
+
   document.querySelector("#condition").textContent =
     describeWeather(weather.current.weatherCode);
 
@@ -377,6 +428,7 @@ function displayWeather(weather) {
   for (const day of weather.forecast) {
     const forecastDay = document.createElement("article");
     const weekday = document.createElement("strong");
+    const icon = document.createElement("span");
     const condition = document.createElement("span");
     const temperatures = document.createElement("span");
     const date = new Date(`${day.date}T12:00:00`);
@@ -387,6 +439,10 @@ function displayWeather(weather) {
       weekday: "short"
     });
 
+    icon.className = "weather-icon forecast-weather-icon";
+    icon.setAttribute("aria-hidden", "true");
+    icon.textContent = weatherIcon(day.weatherCode);
+
     condition.textContent = describeWeather(day.weatherCode);
 
     temperatures.textContent =
@@ -394,6 +450,7 @@ function displayWeather(weather) {
 
     forecastDay.append(
       weekday,
+      icon,
       condition,
       temperatures
     );
